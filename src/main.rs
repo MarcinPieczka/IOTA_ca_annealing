@@ -13,20 +13,21 @@ fn main() {
     let mut failed = 0;
     loop {
         total += 1;
+        let n = thread_rng().gen_range(1000, 10000);
         let mut nodes = Vec::new();
-        for _ in 0..1000 {
+        for _ in 0..n {
             nodes.push(Node{
                 vote: random(),
                 neighbours: Vec::new()
             })
         }
         // generate connections
-        for i in 0..1000 {
+        for i in 0..n {
             let mut excluded = vec![i];
             for _ in 0..4 {
                 let mut x;
                 loop {
-                    x = thread_rng().gen_range(0, 1000);
+                    x = thread_rng().gen_range(0, n);
                     if !excluded.contains(&x) {
                         excluded.push(x);
                         break;
