@@ -1,10 +1,9 @@
 use rand::prelude::*;
 use std::time::Instant;
 
-
 struct Node {
     vote: bool,
-    peers: Vec<*const bool>
+    neighbours: Vec<i16>
 }
 
 fn main() {
@@ -19,7 +18,7 @@ fn main() {
         for _ in 0..n {
             nodes.push(Node{
                 vote: random(),
-                peers: Vec::new()
+                neighbours: Vec::new()
             })
         }
         // generate connections
@@ -34,10 +33,8 @@ fn main() {
                         break;
                     }
                 }
-                let mut ptr = &nodes[x].vote as *const bool;
-                nodes[i].peers.push(ptr);
-                ptr = &nodes[i].vote as *const bool;
-                nodes[x].peers.push(ptr);
+                nodes[i].neighbours.push(x as i16);
+                nodes[x].neighbours.push(i as i16);
             }
         }
         let mut i = 0;
@@ -64,13 +61,10 @@ fn main() {
 
 fn one_epoch(nodes: &mut Vec<Node>){
     for i in 0..nodes.len(){
-        let n_true: usize;
-        unsafe {
-            n_true = nodes[i].peers.iter()
-                .map(|&x| if *x {1} else {0})
-                .sum();
-        }
-        let all = nodes[i].peers.len();
+        let n_true = nodes[i].neighbours.iter().map(|&x| nodes[x as usize].vote)
+            .filter(|&x| x)
+            .count();
+        let all = nodes[i].neighbours.len();
         if n_true * 2 == all {
             nodes[i].vote = !nodes[i].vote;
         } else {
