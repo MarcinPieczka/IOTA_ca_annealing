@@ -5,8 +5,18 @@ struct Node {
     vote: bool,
     neighbours: Vec<i16>
 }
+use pyo3::prelude::*;
+use pyo3::wrap_pyfunction;
 
-fn main() {
+
+#[pymodule]
+fn ca_annealing(py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_wrapped(wrap_pyfunction!(get_metastable))?;
+    Ok(())
+}
+
+#[pyfunction]
+fn get_metastable() -> PyResult<String> {
     // generate nodes
     let start = Instant::now();
     let mut total = 0;
@@ -14,15 +24,18 @@ fn main() {
 
     loop {
         total += 1;
-        if !one_voting() {
+        let res = one_voting();
+        if !res {
             failed += 1;
             println!(
                 "fail ratio: {}%, {} 1/s",
                 100.0 * failed as f32 / total as f32,
                 total as f32 / start.elapsed().as_secs_f32()
-            )
+            );
+            break;
         }
     }
+    Ok("done".to_string())
 }
 
 fn one_voting() -> bool {
