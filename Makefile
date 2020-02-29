@@ -1,8 +1,2 @@
 build:
-	cargo +nightly build && cargo +nightly build --release
-
-build-release:
-	cargo +nightly build --release
-
-build-dev:
-	cargo +nightly build
+	python3 ./setup.py install
